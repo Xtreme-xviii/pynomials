@@ -1,6 +1,12 @@
 class Poly:
 
+"""This class is used to create polynomial
+objects with x terms."""
+
     def __init__(self, *coefs):
+
+        """pass in coefficients in the order of x's degree"""
+
         if coefs[0] and coefs:
             for deg in range(len(coefs)):
                 self.__dict__['x'+str(deg)] = coefs[::-1][deg]
@@ -9,6 +15,7 @@ class Poly:
             raise ValueError('Cannot pass empty coefficient for greatest degree of x')
 
     def expr(self):
+        """Raw format(readable) of the polynomial"""
         expr = []
         for deg, cof in self.__dict__.items():
             term = ''
@@ -28,6 +35,7 @@ class Poly:
         ) + ")]>"
 
     def __len__(self):
+        """Number of terms"""
         return len(self.__dict__) - 1
 
     def __add__(self, other):
@@ -130,3 +138,4 @@ class Poly:
 
     def __call__(self, x):
         return sum([(x ** deg) * self[cof] for deg, cof in enumerate(sorted(self.__dict__))])
+
