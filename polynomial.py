@@ -1,7 +1,5 @@
 class Poly:
-
-"""This class is used to create polynomial
-objects with x terms."""
+    """This class is used to create polynomial objects with x terms."""
 
     def __init__(self, *coefs):
 
@@ -35,7 +33,7 @@ objects with x terms."""
         ) + ")]>"
 
     def __len__(self):
-        """Number of terms"""
+        """Degree of Polynomial"""
         return len(self.__dict__) - 1
 
     def __add__(self, other):
