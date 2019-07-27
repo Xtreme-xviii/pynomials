@@ -5,6 +5,8 @@ class Poly:
     Create a polynomial expression/object by passing in coefficients in to 'Poly' class,
        Eg:-  f = Poly(3, 2, 1)     -->   f(x) = 3x^2 + 2x + 1
              f = Poly(1, 0, 0, 9)  -->   f(x) = x^3 + 9
+    by Kavienan J
+    ©Copyrights 2019 xtreme™
     """
 
     def __init__(self, *coefs):
