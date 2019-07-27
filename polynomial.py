@@ -1,4 +1,5 @@
 class Poly:
+
     """This class is used to create polynomial objects with x terms."""
 
     def __init__(self, *coefs):
@@ -13,7 +14,9 @@ class Poly:
             raise ValueError('Cannot pass empty coefficient for greatest degree of x')
 
     def expr(self):
+
         """Raw format(readable) of the polynomial"""
+
         expr = []
         for deg, cof in self.__dict__.items():
             term = ''
