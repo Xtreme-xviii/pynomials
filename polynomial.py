@@ -1,10 +1,15 @@
 class Poly:
 
-    """This class is used to create polynomial objects with x terms."""
+    """
+    This class creates polynomial objects with x terms.
+    Create a polynomial expression/object by passing in coefficients in to 'Poly' class,
+       Eg:-  f = Poly(3, 2, 1)     -->   f(x) = 3x^2 + 2x + 1
+             f = Poly(1, 0, 0, 9)  -->   f(x) = x^3 + 9
+    """
 
     def __init__(self, *coefs):
 
-        """pass in coefficients in the order of x's degree"""
+        """Pass the coefficients in the order of x term's degree"""
 
         if coefs[0] and coefs:
             for deg in range(len(coefs)):
@@ -15,7 +20,7 @@ class Poly:
 
     def expr(self):
 
-        """Raw format(readable) of the polynomial"""
+        """Raw format/Readable expression of the polynomial"""
 
         expr = []
         for deg, cof in self.__dict__.items():
