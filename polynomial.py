@@ -5,14 +5,22 @@ class Poly:
     Create a polynomial expression/object by passing in coefficients in to 'Poly' class,
        Eg:-  f = Poly(3, 2, 1)     -->   f(x) = 3x^2 + 2x + 1
              f = Poly(1, 0, 0, 9)  -->   f(x) = x^3 + 9
+
+    Possible Operations,
+        - Addition (+)
+        - Subtraction (-)
+        - Multiplication (✕)
+        - Division (÷)
+        - Powers (x^n)
+
+    Function values --> f(x); x=n
+
     by Kavienan J
-    ©Copyrights 2019 xtreme™
+    ©Copyrights 2019 Xtreme™ Solutions
     """
 
     def __init__(self, *coefs):
-
         """Pass the coefficients in the order of x term's degree"""
-
         if coefs[0] and coefs:
             for deg in range(len(coefs)):
                 self.__dict__['x'+str(deg)] = coefs[::-1][deg]
@@ -21,9 +29,7 @@ class Poly:
             raise ValueError('Cannot pass empty coefficient for greatest degree of x')
 
     def expr(self):
-
         """Raw format/Readable expression of the polynomial"""
-
         expr = []
         for deg, cof in self.__dict__.items():
             term = ''
@@ -37,22 +43,54 @@ class Poly:
             expr.append(term)
         return ''.join(expr)
 
-    def _ordering(self, fun):
+    @staticmethod
+    def _ordering(fx):
         """ Returns a dict object with keys ordered to highest degree to the lowest """
-        return {deg: fun[deg] for deg in sorted(fun)[::-1]}
+        return {deg: int(fx[deg]) if float(fx[deg]).is_integer() else float(fx[deg]) for deg in sorted(fx)[::-1]}
 
-    def _divisor(self, other):
+    def _division(self, divisor, operator):
         """ Returns quotient and remainder of division """
-        remainder = self
-        term_deg = len(remainder)
-        quotient = 0
-        while term_deg > 0:
-            term_cof = remainder[len(remainder)]/other[len(other)]
-            term_deg = len(remainder) - len(other)
-            term = Poly(*[0 if i else term_cof for i in range(term_deg + 1)]) if term_deg else Poly(term_cof)
-            quotient = term + quotient
-            remainder = remainder - (term * other)
-        return quotient, remainder
+        x_coefs = self.__dict__.copy()
+        if isinstance(divisor, Poly) and len(self) < len(divisor):
+            raise ArithmeticError("Can't divide lower degree polynomial with higher degree polynomial")
+        elif not len(divisor):
+            divisor = divisor[0]
+        else:
+            remainder = self
+            quotient = 0
+            while len(remainder) >= len(divisor):
+                _cof = remainder[len(remainder)] / divisor[len(divisor)]
+                _deg = len(remainder) - len(divisor)
+                _product = Poly(*[_cof] + [0 for _ in range(_deg)])
+                quotient = _product + quotient
+                remainder = remainder - (_product * divisor)
+                print(_deg, _cof, _product, quotient, remainder)
+            return remainder if operator == '__mod__' else quotient
+        operation = lambda val1, val2: type(val1)(val1).__getattribute__(operator)(val2)
+        new_coefs = dict()
+        for deg in x_coefs.keys():
+            val = operation(x_coefs[deg], divisor)
+            if val or new_coefs:
+                new_coefs[deg] = val
+        return Poly(*new_coefs.values()) if new_coefs else 0
+
+    def _addition_and_subtraction(self, other, operator):
+        x_coefs = self.__dict__.copy()
+        operation = lambda val1, val2: type(val1)(val1).__getattribute__(operator)(val2)
+        if isinstance(other, (int, float)):
+            if other:
+                other = Poly(other)
+            else:
+                return self
+        new_coefs = dict()
+        for deg, cof in other.__dict__.items():
+            _coef = operation(x_coefs[deg], cof) if deg in x_coefs.keys() else operation(0, cof)
+            if _coef != 0 or new_coefs:
+                x_coefs[deg] = _coef
+                new_coefs[deg] = new_coefs
+            else:
+                del x_coefs[deg]
+        return Poly(*self._ordering(x_coefs).values()) if len(x_coefs) else 0
 
     def __repr__(self):
         return "<Polynomial[" + "+".join(
@@ -64,34 +102,10 @@ class Poly:
         return len(self.__dict__) - 1
 
     def __add__(self, other):
-        x_coefs = self.__dict__.copy()
-        if isinstance(other, (int, float)):
-            x_coefs['x0'] = x_coefs['x0'] + other if 'x0' in x_coefs.keys() else other
-        else:  # if Poly object,
-            new_coefs = dict()
-            for deg, cof in other.__dict__.items():
-                n_coef = x_coefs[deg] + cof if deg in x_coefs.keys() else cof
-                if n_coef != 0 or new_coefs:
-                    x_coefs[deg] = n_coef
-                    new_coefs[deg] = new_coefs
-                else:
-                    del x_coefs[deg]
-        return Poly(*self._ordering(x_coefs).values()) if len(x_coefs) else 0
+        return self._addition_and_subtraction(other, '__add__')
 
     def __sub__(self, other):
-        x_coefs = self.__dict__.copy()
-        if isinstance(other, (int, float)):
-            x_coefs['x0'] = x_coefs['x0'] - other if 'x0' in x_coefs.keys() else -other
-        else:  # if Poly object,
-            new_coefs = dict()
-            for deg, cof in other.__dict__.items():
-                n_coef = x_coefs[deg] - cof if deg in x_coefs.keys() else -cof
-                if n_coef != 0 or new_coefs:
-                    x_coefs[deg] = n_coef
-                    new_coefs[deg] = new_coefs
-                else:
-                    del x_coefs[deg]
-        return Poly(*self._ordering(x_coefs).values()) if len(x_coefs) else 0
+        return self._addition_and_subtraction(other, '__sub__')
 
     def __eq__(self, other):
         return self.__dict__ == other.__dict__ if isinstance(other, Poly) else False
@@ -120,51 +134,23 @@ class Poly:
         return Poly(*value.__dict__.values())
 
     def __truediv__(self, other):
-        x_coefs = self.__dict__.copy()
-        if isinstance(other, (int, float)):
-            # TODO: filter non float values into integers
-            return Poly(*(cof / other for cof in x_coefs.values()))
-        # if Poly object,
-        if len(self) < len(other) and type(self) == type(other):
-            raise ArithmeticError("Can't divide lower degree polynomial with higher degree polynomial")
-        return self._divisor(other)[0]
+        return self._division(other, '__truediv__')
 
     def __floordiv__(self, other):
-        x_coefs = self.__dict__.copy()
-        if isinstance(other, (int, float)):
-            new_coefs = dict()
-            for deg in x_coefs.keys():
-                val = x_coefs[deg] // other
-                if val or new_coefs:
-                    new_coefs[deg] = val
-            return Poly(*new_coefs.values()) if new_coefs else 0
-        if len(self) < len(other) and type(self) == type(other):
-            raise ArithmeticError("Can't divide lower degree polynomial with higher degree polynomial")
-        return self._divisor(other)[0]
+        return self._division(other, '__floordiv__')
 
     def __mod__(self, other):
-        x_coefs = self.__dict__.copy()
-        if isinstance(other, (int, float)):
-            new_coefs = dict()
-            for deg in x_coefs.keys():
-                val = x_coefs[deg] % other
-                if val or new_coefs:
-                    new_coefs[deg] = val
-            return Poly(*new_coefs.values()) if new_coefs else 0
-        if len(self) < len(other) and type(self) == type(other):
-            raise ArithmeticError("Can't divide lower degree polynomial with higher degree polynomial")
-        return self._divisor(other)[1]
+        return self._division(other, '__mod__')
 
     def __getitem__(self, pos):
         if pos in self.__dict__.keys():
             return self.__dict__[pos]  # item accessed through key/variable
         elif pos in range(len(self.__dict__)):
             return self.__dict__['x' + str(pos)]  # item accessed through index of coefficient
+        if isinstance(pos, str):
+            raise KeyError("coefficient for the given variable doesn't exist")
         else:
-            if isinstance(pos, str):
-                raise KeyError("coefficient for the given variable doesn't exist")
-            else:
-                raise IndexError("coefficient for the given x degree doesn't exist")
+            raise IndexError("coefficient for the given x degree doesn't exist")
 
     def __call__(self, x):
         return sum([(x ** deg) * self[cof] for deg, cof in enumerate(sorted(self.__dict__))])
