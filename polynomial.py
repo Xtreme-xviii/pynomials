@@ -51,21 +51,21 @@ class Poly:
     def _division(self, divisor, operator):
         """ Returns quotient and remainder of division """
         x_coefs = self.__dict__.copy()
-        if isinstance(divisor, Poly) and len(self) < len(divisor):
-            raise ArithmeticError("Can't divide lower degree polynomial with higher degree polynomial")
-        elif not len(divisor):
-            divisor = divisor[0]
-        else:
-            remainder = self
-            quotient = 0
-            while len(remainder) >= len(divisor):
-                _cof = remainder[len(remainder)] / divisor[len(divisor)]
-                _deg = len(remainder) - len(divisor)
-                _product = Poly(*[_cof] + [0 for _ in range(_deg)])
-                quotient = _product + quotient
-                remainder = remainder - (_product * divisor)
-                print(_deg, _cof, _product, quotient, remainder)
-            return remainder if operator == '__mod__' else quotient
+        if isinstance(divisor, Poly):
+            if len(self) < len(divisor):
+                raise ArithmeticError("Can't divide lower degree polynomial with higher degree polynomial")
+            elif not len(divisor):
+                divisor = divisor[0]
+            else:
+                remainder = self
+                quotient = 0
+                while len(remainder) >= len(divisor):
+                    _cof = remainder[len(remainder)] / divisor[len(divisor)]
+                    _deg = len(remainder) - len(divisor)
+                    _product = Poly(*[_cof] + [0 for _ in range(_deg)])
+                    quotient = _product + quotient
+                    remainder = remainder - (_product * divisor)
+                return remainder if operator == '__mod__' else quotient
         operation = lambda val1, val2: type(val1)(val1).__getattribute__(operator)(val2)
         new_coefs = dict()
         for deg in x_coefs.keys():
@@ -153,4 +153,4 @@ class Poly:
             raise IndexError("coefficient for the given x degree doesn't exist")
 
     def __call__(self, x):
-        return sum([(x ** deg) * self[cof] for deg, cof in enumerate(sorted(self.__dict__))])
+        return sum([(x ** deg)*self[deg] for deg in range(len(self)+1)])
