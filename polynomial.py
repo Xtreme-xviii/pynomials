@@ -125,12 +125,12 @@ class Poly:
     def __pow__(self, index):
         if not index:
             return 1
-        elif index > 0:
+        elif index >= 1:
             value = self
             for _ in range(1, index):
                 value *= self  # n^3 ===> for _ in range(1, 3): answer_n *= n;
         else:
-            raise ValueError('negative index is not allowed for polynomials')
+            raise ValueError('negative or decimal index is not allowed for polynomials')
         return Poly(*value.__dict__.values())
 
     def __truediv__(self, other):
