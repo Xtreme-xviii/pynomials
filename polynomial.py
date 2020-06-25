@@ -66,7 +66,7 @@ class Poly:
                     quotient = _product + quotient
                     remainder = remainder - (_product * divisor)
                 return remainder if operator == '__mod__' else quotient
-        operation = lambda val1, val2: type(val1)(val1).__getattribute__(operator)(val2)
+        operation = lambda val1, val2: float(val1).__getattribute__(operator)(val2)
         new_coefs = dict()
         for deg in x_coefs.keys():
             val = operation(x_coefs[deg], divisor)
@@ -76,7 +76,7 @@ class Poly:
 
     def _addition_and_subtraction(self, other, operator):
         x_coefs = self.__dict__.copy()
-        operation = lambda val1, val2: type(val1)(val1).__getattribute__(operator)(val2)
+        operation = lambda val1, val2: float(val1).__getattribute__(operator)(val2)
         if isinstance(other, (int, float)):
             if other:
                 other = Poly(other)
