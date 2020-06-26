@@ -114,7 +114,7 @@ class Poly:
         x_coefs = self.__dict__.copy()
         if isinstance(other, (int, float)):
             return Poly(*(cof*other for cof in x_coefs.values()))
-        # if Poly object,
+        # if Poly object
         new_coefs = dict()
         for deg1, cof1 in other.__dict__.items():
             for deg2, cof2 in x_coefs.items():
