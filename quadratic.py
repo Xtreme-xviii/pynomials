@@ -1,5 +1,5 @@
 from .polynomial import Poly
-from differentiation import dd, d
+from .differentiation import dd, d
 
 
 class Quad(Poly):
